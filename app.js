@@ -1,12 +1,8 @@
-// Require dotenv
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config();
-}
-
-// Require the Bolt package (github.com/slackapi/bolt)
-const { App } = require('@slack/bolt');
+import {} from 'dotenv/config';
+import pkg from '@slack/bolt';
 
 // Create a Bolt app
+const { App } = pkg;
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
