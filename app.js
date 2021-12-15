@@ -206,9 +206,8 @@ app.view('kudos_modal', async ({ ack, body, view, client, logger }) => {
 
   // logger.info('body:');
   // logger.info(body);
-  const user = body['user']['id'];
-  // logger.info(user);
-  // U02Q7ATE230
+  const user = body['user'];
+  logger.info(user);
 
   const kudosChannel = await findConversation('kudos');
   // logger.info('kudosChannel');
@@ -237,6 +236,13 @@ app.view('kudos_modal', async ({ ack, body, view, client, logger }) => {
             text: view['state']['values']['summary']['summary_input_text'][
               'value'
             ],
+          },
+        },
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: `_Submitted by <@${user['username']}>_`,
           },
         },
       ],
