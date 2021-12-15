@@ -75,14 +75,14 @@ app.shortcut('post_kudos', async ({ shortcut, ack, client, logger }) => {
           },
           {
             type: 'input',
-            block_id: 'values',
+            block_id: 'core_values',
             label: {
               type: 'plain_text',
               text: 'Wheel values they demonstrated',
             },
             element: {
               type: 'multi_static_select',
-              action_id: 'values_selections',
+              action_id: 'core_values_selections',
               placeholder: {
                 type: 'plain_text',
                 text: 'Pick one or more Wheel values!',
@@ -138,7 +138,7 @@ app.shortcut('post_kudos', async ({ shortcut, ack, client, logger }) => {
               action_id: 'description_input',
               placeholder: {
                 type: 'plain_text',
-                text: 'Give us more details on what happened and how awesome it was!',
+                text: 'Give us more details on what happened and how awesome it was (you can include emoji here with the :emoji: syntax too!)',
               },
               multiline: true,
             },
@@ -156,8 +156,7 @@ app.shortcut('post_kudos', async ({ shortcut, ack, client, logger }) => {
       },
     });
 
-    // logger.info('Shortcut result:');
-    // logger.info(result);
+    logger.info(result);
   } catch (error) {
     logger.error(error);
   }
@@ -189,60 +188,61 @@ app.view('kudos_modal', async ({ ack, body, view, client, logger }) => {
   // Acknowledge the view_submission request
   await ack();
 
-  logger.info('kudos_modal view submission received! view:');
-  logger.info(view);
-  logger.info('view -> state:');
-  logger.info(view['state']);
-  logger.info('view -> state -> values:');
-  logger.info(view['state']['values']);
-  // {
-  //   users: { YA995: { type: 'multi_users_select', selected_users: [Array] } },
-  //   summary: { clWa: { type: 'plain_text_input', value: 'test' } },
-  //   values: {
-  //     '1pwP': { type: 'multi_static_select', selected_options: [Array] }
-  //   },
-  //   description: { fhiD: { type: 'plain_text_input', value: 'desc' } }
-  // }
-
-  // logger.info('body:');
-  // logger.info(body);
-  const user = body['user'];
-  logger.info(user);
-
-  const kudosChannel = await findConversation('kudos');
-  // logger.info('kudosChannel');
-  // logger.info(kudosChannel);
-
-  // Build message
-
-  // Post message
+  // Build and post message
   try {
-    // Used as fallback or for assistive technology
-    let messageText =
+    const user = body['user'];
+    const kudosChannel = await findConversation('kudos');
+
+    const summaryText =
       view['state']['values']['summary']['summary_input_text']['value'];
-    logger.info('messageText');
-    logger.info(
-      view['state']['values']['summary']['summary_input_text']['value']
-    ); // this has an ID key
+    const coreValuesText = view['state']['values']['core_values'][
+      'core_values_selections'
+    ]['selected_options']
+      .map((element) => element['text']['text'])
+      .join(' | ');
+    const descriptionText =
+      view['state']['values']['description']['description_input']['value'];
+    const submittedByText = `_Submitted by <@${user['username']}>_`;
+
+    // Used as fallback or for assistive technology
+    const fullMessageText = `Kudos! ${summaryText} | Values: ${coreValuesText} | More detail: ${descriptionText} | Submitted by: ${submittedByText}`;
 
     await client.chat.postMessage({
       channel: kudosChannel,
-      text: messageText,
+      text: fullMessageText,
       blocks: [
         {
           type: 'header',
           text: {
             type: 'plain_text',
-            text: view['state']['values']['summary']['summary_input_text'][
-              'value'
-            ],
+            text: summaryText,
           },
         },
         {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: `_Submitted by <@${user['username']}>_`,
+            text: `*${coreValuesText}*`,
+          },
+        },
+        {
+          type: 'divider',
+        },
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: descriptionText,
+          },
+        },
+        {
+          type: 'divider',
+        },
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: submittedByText,
           },
         },
       ],
