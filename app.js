@@ -35,6 +35,7 @@ app.shortcut('post_kudos', async ({ shortcut, ack, client, logger }) => {
         blocks: [
           {
             type: 'section',
+            block_id: 'header',
             text: {
               type: 'mrkdwn',
               text: 'When you hit Post, your kudos will be posted to the #kudos channel!',
@@ -42,12 +43,14 @@ app.shortcut('post_kudos', async ({ shortcut, ack, client, logger }) => {
           },
           {
             type: 'input',
+            block_id: 'users',
             label: {
               type: 'plain_text',
               text: 'Kudos to...',
             },
             element: {
               type: 'multi_users_select',
+              action_id: 'multi_users_selections',
               placeholder: {
                 type: 'plain_text',
                 text: 'Tag your teammates here!',
@@ -56,12 +59,14 @@ app.shortcut('post_kudos', async ({ shortcut, ack, client, logger }) => {
           },
           {
             type: 'input',
+            block_id: 'summary',
             label: {
               type: 'plain_text',
               text: 'Summary',
             },
             element: {
               type: 'plain_text_input',
+              action_id: 'summary_input_text',
               placeholder: {
                 type: 'plain_text',
                 text: 'A quick summary of why you are giving them a shout-out!',
@@ -70,12 +75,14 @@ app.shortcut('post_kudos', async ({ shortcut, ack, client, logger }) => {
           },
           {
             type: 'input',
+            block_id: 'core_values',
             label: {
               type: 'plain_text',
               text: 'Wheel values they demonstrated',
             },
             element: {
               type: 'multi_static_select',
+              action_id: 'core_values_selections',
               placeholder: {
                 type: 'plain_text',
                 text: 'Pick one or more Wheel values!',
@@ -121,15 +128,17 @@ app.shortcut('post_kudos', async ({ shortcut, ack, client, logger }) => {
           },
           {
             type: 'input',
+            block_id: 'description',
             label: {
               type: 'plain_text',
               text: 'Description',
             },
             element: {
               type: 'plain_text_input',
+              action_id: 'description_input',
               placeholder: {
                 type: 'plain_text',
-                text: 'Give us more details on what happened and how awesome it was!',
+                text: 'Give us more details on what happened and how awesome it was (you can include emoji here with the :emoji: syntax too!)',
               },
               multiline: true,
             },
@@ -148,6 +157,96 @@ app.shortcut('post_kudos', async ({ shortcut, ack, client, logger }) => {
     });
 
     logger.info(result);
+  } catch (error) {
+    logger.error(error);
+  }
+});
+
+// Find conversation ID using the conversations.list method
+async function findConversation(name) {
+  try {
+    // Call the conversations.list method using the built-in WebClient
+    const result = await app.client.conversations.list({
+      token: process.env.SLACK_BOT_TOKEN,
+    });
+
+    let conversationId;
+    for (const channel of result.channels) {
+      if (channel.name === name) {
+        conversationId = channel.id;
+        break;
+      }
+    }
+
+    return conversationId;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+app.view('kudos_modal', async ({ ack, body, view, client, logger }) => {
+  // Acknowledge the view_submission request
+  await ack();
+
+  // Build and post message
+  try {
+    const user = body['user'];
+    const kudosChannel = await findConversation('kudos');
+
+    const summaryText =
+      view['state']['values']['summary']['summary_input_text']['value'];
+    const coreValuesText = view['state']['values']['core_values'][
+      'core_values_selections'
+    ]['selected_options']
+      .map((element) => element['text']['text'])
+      .join(' | ');
+    const descriptionText =
+      view['state']['values']['description']['description_input']['value'];
+    const submittedByText = `_Submitted by <@${user['username']}>_`;
+
+    // Used as fallback or for assistive technology
+    const fullMessageText = `Kudos! ${summaryText} | Values: ${coreValuesText} | More detail: ${descriptionText} | Submitted by: ${submittedByText}`;
+
+    await client.chat.postMessage({
+      channel: kudosChannel,
+      text: fullMessageText,
+      blocks: [
+        {
+          type: 'header',
+          text: {
+            type: 'plain_text',
+            text: summaryText,
+          },
+        },
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: `*${coreValuesText}*`,
+          },
+        },
+        {
+          type: 'divider',
+        },
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: descriptionText,
+          },
+        },
+        {
+          type: 'divider',
+        },
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: submittedByText,
+          },
+        },
+      ],
+    });
   } catch (error) {
     logger.error(error);
   }
