@@ -1,29 +1,16 @@
 import registerShortcutListener from '../../listeners/register-shortcut-listener.js';
 import sinon from 'sinon';
 
-// TESTING NOTES
-// app = injected dependency with a #shortcut(callback_id, callback) method
-// app.shortcut(callback_id, callback)
-
-// ** We inject app into this extracted function, so app can be whatever we want!
-
-// const appMock = {
-//   shortcut(callbackId, callback) { callback({ shortcut, ack, client, logger }) }
-// }
-
-// registerShortcutListener(appMock)
-//    -> appMock.shortcut(callbackId, callback) -> runs the callback
-
 test('works', async () => {
-  // shortcut is an object with a #trigger_id method that returns a long string like '2875959438160.2830055761090.7355c2b2bef4764a636ed1cefa98ae4a'
+  // These comments can be removed when I convert to TypeScript!
+  // shortcut : an object with a #trigger_id method that returns a long string like '2875959438160.2830055761090.7355c2b2bef4764a636ed1cefa98ae4a'
   const shortcut = {
-    trigger_id: '111.111.1111',
+    trigger_id: '111.111.11a11b1',
   };
-  // ack is an async function that resovles, we don't care about the results
+  // ack() : async function that resovles, we don't care about the results
   const ack = sinon.fake.resolves(true);
 
-  //client
-  // views -> open accepts a big view object and returns a result object a la:
+  // client -> views -> open accepts a big view object and returns a result object a la:
   // {
   //   ok: true,
   //   view: {
@@ -35,14 +22,10 @@ test('works', async () => {
   // }
 
   const fakeResult = { ok: true };
-  const views = { async open() {} };
-  const viewsStub = sinon.stub(views, 'open').resolves(fakeResult);
-  const client = { views };
+  const client = { views: { open: sinon.fake.resolves(fakeResult) } };
 
-  // logger - TODO
-  const logger = { info() {}, error() {} };
-  const loggerInfoStub = sinon.stub(logger, 'info');
-  const loggerErrorStub = sinon.stub(logger, 'error');
+  // logger: object with info() and error() methods; we don't care what they do yet
+  const logger = { info: sinon.fake(), error: sinon.fake() };
 
   const appMock = {
     shortcut(callbackId, callback) {
@@ -50,13 +33,152 @@ test('works', async () => {
     },
   };
 
-  registerShortcutListener(appMock);
+  await registerShortcutListener(appMock);
 
-  expect(true).toBe(true);
+  const viewPayload = {
+    trigger_id: shortcut.trigger_id,
+    view: {
+      type: 'modal',
+      callback_id: 'kudos_modal',
+      title: {
+        type: 'plain_text',
+        text: 'Post Kudos',
+      },
+      close: {
+        type: 'plain_text',
+        text: 'Cancel',
+      },
+      submit: {
+        type: 'plain_text',
+        text: 'Post',
+      },
+      blocks: [
+        {
+          type: 'section',
+          block_id: 'header',
+          text: {
+            type: 'mrkdwn',
+            text: 'When you hit Post, your kudos will be posted to the #kudos channel!',
+          },
+        },
+        {
+          type: 'input',
+          block_id: 'users',
+          label: {
+            type: 'plain_text',
+            text: 'Kudos to...',
+          },
+          element: {
+            type: 'multi_users_select',
+            action_id: 'multi_users_selections',
+            placeholder: {
+              type: 'plain_text',
+              text: 'Tag your teammates here!',
+            },
+          },
+        },
+        {
+          type: 'input',
+          block_id: 'summary',
+          label: {
+            type: 'plain_text',
+            text: 'Summary',
+          },
+          element: {
+            type: 'plain_text_input',
+            action_id: 'summary_input_text',
+            placeholder: {
+              type: 'plain_text',
+              text: 'A quick summary of why you are giving them a shout-out!',
+            },
+          },
+        },
+        {
+          type: 'input',
+          block_id: 'core_values',
+          label: {
+            type: 'plain_text',
+            text: 'Wheel values they demonstrated',
+          },
+          element: {
+            type: 'multi_static_select',
+            action_id: 'core_values_selections',
+            placeholder: {
+              type: 'plain_text',
+              text: 'Pick one or more Wheel values!',
+            },
+            options: [
+              {
+                text: {
+                  type: 'plain_text',
+                  text: ':heart: Empathy, everyday',
+                },
+                value: 'empathy',
+              },
+              {
+                text: {
+                  type: 'plain_text',
+                  text: ':handshake: Be trusted',
+                },
+                value: 'trusted',
+              },
+              {
+                text: {
+                  type: 'plain_text',
+                  text: ':muscle: Grit to grow',
+                },
+                value: 'grit',
+              },
+              {
+                text: {
+                  type: 'plain_text',
+                  text: ':busts_in_silhouette: Further together',
+                },
+                value: 'together',
+              },
+              {
+                text: {
+                  type: 'plain_text',
+                  text: ':bullettrain_front: High velocity',
+                },
+                value: 'velocity',
+              },
+            ],
+          },
+        },
+        {
+          type: 'input',
+          block_id: 'description',
+          label: {
+            type: 'plain_text',
+            text: 'Description',
+          },
+          element: {
+            type: 'plain_text_input',
+            action_id: 'description_input',
+            placeholder: {
+              type: 'plain_text',
+              text: 'Give us more details on what happened and how awesome it was (you can include emoji here with the :emoji: syntax too!)',
+            },
+            multiline: true,
+          },
+        },
+        {
+          type: 'context',
+          elements: [
+            {
+              type: 'mrkdwn',
+              text: 'Kudobot designed by Ellie',
+            },
+          ],
+        },
+      ],
+    },
+  };
 
-  // TODO - ASSERT
-  // sinon.assert.calledWith(spy, message);
+  sinon.assert.calledOnce(client.views.open);
+  sinon.assert.calledWith(client.views.open, viewPayload);
 
-  // TODO - add afterEach and sinon restore to prevent leaks
+  // TODO - add afterEach and sinon restore to prevent leaks but DONT put this in the example itself
   // sinon.restore();
 });

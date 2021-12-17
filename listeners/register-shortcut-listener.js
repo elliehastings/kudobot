@@ -4,7 +4,6 @@ export default function registerShortcutListener(app) {
       // Acknowledge shortcut request
       await ack();
 
-      // Call views.open using one of the built-in WebClients to open the kudos modal
       const result = await client.views.open({
         trigger_id: shortcut.trigger_id,
         view: {
