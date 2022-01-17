@@ -5,12 +5,14 @@ export default async function handleShortcut({
   ack,
   client,
   logger,
+  command,
 }) {
   try {
     await ack();
 
+    const incomingAction = shortcut ? shortcut : command;
     const result = await client.views.open({
-      trigger_id: shortcut.trigger_id,
+      trigger_id: incomingAction.trigger_id,
       view: modalView,
     });
 

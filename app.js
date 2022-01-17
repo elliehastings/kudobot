@@ -1,6 +1,7 @@
 import {} from 'dotenv/config';
 import pkg from '@slack/bolt';
 import registerShortcutListener from './listeners/register-shortcut-listener.js';
+import registerSlashCommandListener from './listeners/register-slash-command-listener.js';
 import registerModalSubmitListener from './listeners/register-modal-submit-listener.js';
 import handleShortcut from './handlers/handle-shortcut.js';
 
@@ -13,6 +14,7 @@ const app = new App({
 
 // Register event listeners for shortcut creation and modal submissions
 registerShortcutListener(app, handleShortcut);
+registerSlashCommandListener(app, handleShortcut);
 registerModalSubmitListener(app);
 
 // Start the app
