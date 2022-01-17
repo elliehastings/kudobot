@@ -8,7 +8,10 @@ export default function registerModalSubmitListener(app) {
     // Build and post message
     try {
       const user = body['user'];
-      const kudosChannel = await findConversation(app, 'kudos');
+      const targetChannel = await findConversation(
+        app,
+        process.env.CHANNEL_NAME
+      );
 
       const summaryText =
         view['state']['values']['summary']['summary_input_text']['value'];
@@ -25,7 +28,7 @@ export default function registerModalSubmitListener(app) {
       const fullMessageText = `Kudos! ${summaryText} | Values: ${coreValuesText} | More detail: ${descriptionText} | Submitted by: ${submittedByText}`;
 
       await client.chat.postMessage({
-        channel: kudosChannel,
+        channel: targetChannel,
         text: fullMessageText,
         blocks: [
           {
