@@ -124,14 +124,5 @@ export default {
         multiline: true,
       },
     },
-    {
-      type: 'context',
-      elements: [
-        {
-          type: 'mrkdwn',
-          text: 'Kudobot designed by Ellie',
-        },
-      ],
-    },
   ],
 };
