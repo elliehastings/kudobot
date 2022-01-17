@@ -3,7 +3,7 @@ import pkg from '@slack/bolt';
 import registerShortcutListener from './listeners/register-shortcut-listener.js';
 import registerSlashCommandListener from './listeners/register-slash-command-listener.js';
 import registerModalSubmitListener from './listeners/register-modal-submit-listener.js';
-import handleShortcut from './handlers/handle-shortcut.js';
+import handleTrigger from './handlers/handle-trigger.js';
 
 // Create a Bolt app
 const { App } = pkg;
@@ -13,8 +13,8 @@ const app = new App({
 });
 
 // Register event listeners for shortcut creation and modal submissions
-registerShortcutListener(app, handleShortcut);
-registerSlashCommandListener(app, handleShortcut);
+registerShortcutListener(app, handleTrigger);
+registerSlashCommandListener(app, handleTrigger);
 registerModalSubmitListener(app);
 
 // Start the app

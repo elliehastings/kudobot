@@ -1,8 +1,8 @@
-import handleShortcut from '../../handlers/handle-shortcut.js';
+import handleTrigger from '../../handlers/handle-trigger.js';
 import modalView from '../../payloads/modal-view.js';
 import sinon from 'sinon';
 
-test('happy path - acknowledges, opens modal on client, and logs information', async () => {
+test('SHORTCUT: happy path - acknowledges, opens modal on client, and logs information', async () => {
   // shortcut : an object with a #trigger_id method that returns a long string like '2875959438160.2830055761090.7355c2b2bef4764a636ed1cefa98ae4a'
   const shortcut = {
     trigger_id: '111.111.11a11b1',
@@ -29,7 +29,7 @@ test('happy path - acknowledges, opens modal on client, and logs information', a
     logger,
   };
 
-  await handleShortcut(middlewareMock);
+  await handleTrigger(middlewareMock);
 
   sinon.assert.calledOnce(ack);
   sinon.assert.calledOnce(client.views.open);
@@ -38,7 +38,7 @@ test('happy path - acknowledges, opens modal on client, and logs information', a
   sinon.assert.calledOnce(logger.info);
 });
 
-test('ack() error - logs the error', async () => {
+test('SHORTCUT: ack() error - logs the error', async () => {
   const shortcut = {
     trigger_id: '111.111.11a11b1',
   };
@@ -58,7 +58,7 @@ test('ack() error - logs the error', async () => {
     logger,
   };
 
-  await handleShortcut(middlewareMock);
+  await handleTrigger(middlewareMock);
 
   sinon.assert.calledOnce(ack);
 
@@ -69,7 +69,7 @@ test('ack() error - logs the error', async () => {
   sinon.assert.calledWith(logger.error, ackError);
 });
 
-test('client.views.open() error - logs the error', async () => {
+test('SHORTCUT: client.views.open() error - logs the error', async () => {
   const shortcut = {
     trigger_id: '111.111.11a11b1',
   };
@@ -88,7 +88,7 @@ test('client.views.open() error - logs the error', async () => {
     logger,
   };
 
-  await handleShortcut(middlewareMock);
+  await handleTrigger(middlewareMock);
 
   sinon.assert.calledOnce(ack);
   sinon.assert.calledOnce(client.views.open);
@@ -97,4 +97,40 @@ test('client.views.open() error - logs the error', async () => {
 
   sinon.assert.calledOnce(logger.error);
   sinon.assert.calledWith(logger.error, clientError);
+});
+
+test('COMMAND: happy path - acknowledges, opens modal on client, and logs information', async () => {
+  // shortcut : an object with a #trigger_id method that returns a long string like '2875959438160.2830055761090.7355c2b2bef4764a636ed1cefa98ae4a'
+  const command = {
+    trigger_id: '111.111.11a11b1',
+  };
+
+  // ack() : async function that resovles, we don't care about the results
+  const ack = sinon.fake.resolves(true);
+
+  // client -> views -> open accepts a view object and returns a result object ( simplified to { ok: true } )
+  const fakeResult = { ok: true };
+  const client = { views: { open: sinon.fake.resolves(fakeResult) } };
+  const viewPayload = {
+    trigger_id: command.trigger_id,
+    view: modalView,
+  };
+
+  // logger: object with info() and error() methods; we don't care what they do
+  const logger = { info: sinon.fake(), error: sinon.fake() };
+
+  const middlewareMock = {
+    command,
+    ack,
+    client,
+    logger,
+  };
+
+  await handleTrigger(middlewareMock);
+
+  sinon.assert.calledOnce(ack);
+  sinon.assert.calledOnce(client.views.open);
+  sinon.assert.calledWith(client.views.open, viewPayload);
+
+  sinon.assert.calledOnce(logger.info);
 });

@@ -1,6 +1,6 @@
 import modalView from '../payloads/modal-view.js';
 
-export default async function handleShortcut({
+export default async function handleTrigger({
   shortcut,
   ack,
   client,
@@ -10,9 +10,9 @@ export default async function handleShortcut({
   try {
     await ack();
 
-    const incomingAction = shortcut ? shortcut : command;
+    const trigger = shortcut ? shortcut : command;
     const result = await client.views.open({
-      trigger_id: incomingAction.trigger_id,
+      trigger_id: trigger.trigger_id,
       view: modalView,
     });
 
