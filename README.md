@@ -14,6 +14,7 @@ Read the [Bolt documentation](https://slack.dev/bolt) for full documentation.
 
 - `app.js` contains the primary Bolt app. It imports the Bolt package (`@slack/bolt`) and starts the Bolt app's server. It's where we add app listeners.
 - `.env` is where we put your Slack app's authorization token and signing secret. As usual, **do not check sensitive secrets in to version control!** This app requires the following environment variables to be set in `.env` or its equivalent:
+  * `CHANNEL_NAME`
   * `SLACK_BOT_TOKEN`
   * `SLACK_SIGNING_SECRET`
   * `PORT`, if not using the default port 3000

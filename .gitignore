@@ -1,5 +1,7 @@
-.env
-node_modules/
-examples/
+.DS_STORE
+*.env
 .vscode/
+examples/
+npm-debug.log
+node_modules/
 types.md
