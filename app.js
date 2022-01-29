@@ -19,8 +19,8 @@ registerModalSubmitListener(app);
 
 // Start the app
 (async () => {
-  await app.start(process.env.PORT || 3000);
+  await app.start(process.env.PORT || 8000);
 
   // eslint-disable-next-line no-console
-  console.log(`⚡️ Bolt app is running on port ${process.env.PORT || 3000}`);
+  console.log(`⚡️ Bolt app is running on port ${process.env.PORT || 8000}`);
 })();

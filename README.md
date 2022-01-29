@@ -17,13 +17,13 @@ Read the [Bolt documentation](https://slack.dev/bolt) for full documentation.
   * `CHANNEL_NAME`
   * `SLACK_BOT_TOKEN`
   * `SLACK_SIGNING_SECRET`
-  * `PORT`, if not using the default port 3000
+  * `PORT`, if not using the default port specified in `app.js`
 
 ## Running the app locally
 
 - Configure your `.env` file or run the app with the above environment variables associated to your Slack app
 - Set up an [ngrok server](https://ngrok.com/) to proxy requests to your local server.
-  * Be sure to specify the port used by the Node app when starting ngrok, for example: `ngrok http 3000`
+  * Be sure to specify the port used by the Node app when starting ngrok, for example: `ngrok http 8000`
   * Add your local ngrok server URL to your slack app's Event Request URL in the format `http://xyz.ngrok.io/slack/events`
 
 ## Tests
