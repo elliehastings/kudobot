@@ -13,6 +13,13 @@ export default function registerModalSubmitListener(app) {
         process.env.CHANNEL_NAME
       );
 
+      const selectedUserIds =
+        view['state']['values']['users']['multi_users_selections'][
+          'selected_users'
+        ];
+      const selectedUsersText = selectedUserIds
+        .map((userId) => `<@${userId}>`)
+        .join(', ');
       const summaryText =
         view['state']['values']['summary']['summary_input_text']['value'];
       const coreValuesText = view['state']['values']['core_values'][
@@ -25,7 +32,7 @@ export default function registerModalSubmitListener(app) {
       const submittedByText = `_Submitted by <@${user['username']}>_`;
 
       // Used as fallback or for assistive technology
-      const fullMessageText = `Kudos! ${summaryText} | Values: ${coreValuesText} | More detail: ${descriptionText} | Submitted by: ${submittedByText}`;
+      const fullMessageText = `Kudos! | To ${selectedUsersText} | ${summaryText} | Values: ${coreValuesText} | More detail: ${descriptionText} | Submitted by: ${submittedByText}`;
 
       await client.chat.postMessage({
         channel: targetChannel,
@@ -37,6 +44,16 @@ export default function registerModalSubmitListener(app) {
               type: 'plain_text',
               text: summaryText,
             },
+          },
+          {
+            type: 'section',
+            text: {
+              type: 'mrkdwn',
+              text: selectedUsersText,
+            },
+          },
+          {
+            type: 'divider',
           },
           {
             type: 'section',

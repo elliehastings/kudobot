@@ -7,7 +7,6 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watchAll",
-    "test:debug": "node --inspect node_modules/.bin/jest --runInBand tests/listeners/register-shortcut-listener.test.js",
     "start": "node app.js",
     "watch": "nodemon app.js"
   },

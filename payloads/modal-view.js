@@ -3,7 +3,7 @@ export default {
   callback_id: 'kudos_modal',
   title: {
     type: 'plain_text',
-    text: 'Post Kudos',
+    text: 'Give kudos! :clap:',
   },
   close: {
     type: 'plain_text',
@@ -11,7 +11,7 @@ export default {
   },
   submit: {
     type: 'plain_text',
-    text: 'Post',
+    text: 'Post :rocket:',
   },
   blocks: [
     {
@@ -19,7 +19,7 @@ export default {
       block_id: 'header',
       text: {
         type: 'mrkdwn',
-        text: 'When you hit Post, your kudos will be posted to the #kudos channel!',
+        text: 'When you hit Post, your kudos will be posted to the values channel!',
       },
     },
     {
@@ -27,7 +27,7 @@ export default {
       block_id: 'users',
       label: {
         type: 'plain_text',
-        text: 'Kudos to...',
+        text: 'I want to give kudos to...',
       },
       element: {
         type: 'multi_users_select',
@@ -43,14 +43,14 @@ export default {
       block_id: 'summary',
       label: {
         type: 'plain_text',
-        text: 'Summary',
+        text: 'In a few words:',
       },
       element: {
         type: 'plain_text_input',
         action_id: 'summary_input_text',
         placeholder: {
           type: 'plain_text',
-          text: 'A quick summary of why you are giving them a shout-out!',
+          text: 'Thank you / props for...',
         },
       },
     },
@@ -59,14 +59,14 @@ export default {
       block_id: 'core_values',
       label: {
         type: 'plain_text',
-        text: 'Wheel values they demonstrated',
+        text: 'Values they demonstrated',
       },
       element: {
         type: 'multi_static_select',
         action_id: 'core_values_selections',
         placeholder: {
           type: 'plain_text',
-          text: 'Pick one or more Wheel values!',
+          text: 'Select from our company values!',
         },
         options: [
           {
@@ -119,7 +119,7 @@ export default {
         action_id: 'description_input',
         placeholder: {
           type: 'plain_text',
-          text: 'Give us more details on what happened and how awesome it was (you can include emoji here with the :emoji: syntax too!)',
+          text: 'Give us more details on what they did and how awesome it was (you can include emoji here with the :emoji: syntax too!)',
         },
         multiline: true,
       },
