@@ -1,4 +1,5 @@
 import findConversation from '../client-api/find-conversation.js';
+import extractViewData from '../utils/extract-view-data.js';
 
 export default function registerModalSubmitListener(app) {
   app.view('kudos_modal', async ({ ack, body, view, client, logger }) => {
@@ -7,29 +8,19 @@ export default function registerModalSubmitListener(app) {
 
     // Build and post message
     try {
-      const user = body['user'];
       const targetChannel = await findConversation(
         app,
         process.env.CHANNEL_NAME
       );
 
-      const selectedUserIds =
-        view['state']['values']['users']['multi_users_selections'][
-          'selected_users'
-        ];
-      const selectedUsersText = selectedUserIds
-        .map((userId) => `<@${userId}>`)
-        .join(', ');
-      const summaryText =
-        view['state']['values']['summary']['summary_input_text']['value'];
-      const coreValuesText = view['state']['values']['core_values'][
-        'core_values_selections'
-      ]['selected_options']
-        .map((element) => element['text']['text'])
-        .join(' | ');
-      const descriptionText =
-        view['state']['values']['description']['description_input']['value'];
-      const submittedByText = `_Submitted by <@${user['username']}>_`;
+      const {
+        selectedUsersText,
+        summaryText,
+        coreValuesText,
+        descriptionText,
+      } = extractViewData(view);
+
+      const submittedByText = `_Submitted by <@${body['user']['username']}>_`;
 
       // Used as fallback or for assistive technology
       const fullMessageText = `Kudos! | To ${selectedUsersText} | ${summaryText} | Values: ${coreValuesText} | More detail: ${descriptionText} | Submitted by: ${submittedByText}`;
