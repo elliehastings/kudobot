@@ -30,3 +30,9 @@ Read the [Bolt documentation](https://slack.dev/bolt) for full documentation.
 
 - Run `npm start` or `npm run watch` (using `nodemon` if installed) to run your app locally
 - Run `npm test` to run tests once, or `npm test:watch` to keep test suite running and watching for changes
+
+## To Do
+
+- Update documentation
+- Replace `sinon` with Jest mocks 🙂
+- Make input values more configurable
